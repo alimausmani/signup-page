@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
 import "../styles/App.css";
 
 const App = () => {
@@ -8,13 +7,16 @@ const App = () => {
     email: "",
     gender: "male",
     phonenumber: "",
-    password: ""
+    password: "",
+    termsAndConditions: false
   });
   const [submitted, setSubmitted] = useState(false);
   const [valid, setValid] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleNameInputChange = (event) => {
-    setValues({ ...values, name: event.target.value });
+    const newName = event.target.value.replace(/[^A-Za-z ]/g, "");
+    setValues({ ...values, name: newName });
   };
 
   const handleEmailInputChange = (event) => {
@@ -33,6 +35,10 @@ const App = () => {
     setValues({ ...values, password: event.target.value });
   };
 
+  const handleTermsInputChange = () => {
+    setValues({ ...values, termsAndConditions: !values.termsAndConditions });
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     if (
@@ -40,25 +46,36 @@ const App = () => {
       values.email &&
       values.phonenumber &&
       values.password &&
+      values.termsAndConditions &&
       values.password.length > 5 &&
       values.email.includes("@") &&
       isNaN(values.name)
     ) {
       setValid(true);
+      setSuccessMessage(`Hello ${values.email.split("@")[0]}. Your signup is successful!`);
+      setValues({
+        name: "",
+        email: "",
+        gender: "male",
+        phonenumber: "",
+        password: "",
+        termsAndConditions: false
+      });
     }
     setSubmitted(true);
   };
 
   return (
     <div id="main">
+      <img
+        src="https://pxbar.com/wp-content/uploads/2023/09/cartoon-profile-pic-for-girl-1024x1024.jpg"
+        alt="Header Image"
+        style={{ width: "15%", marginBottom: "20px", borderRadius: "50%", height: "3%" }}
+      />
       <h2>Sign Up Form</h2>
       <div>
-        <form id="register-form" onClick={handleSubmit}>
-          {submitted && valid ? (
-            <h2 className="success-message">
-              Hello {values.email.split("@")[0]}
-            </h2>
-          ) : null}
+        <form id="register-form" onSubmit={handleSubmit}>
+          {submitted && valid && <h2 className="success-message">{successMessage}</h2>}
           <ul className="wrapper">
             <li className="form-row">
               <label htmlFor="name">Name</label>
@@ -72,10 +89,6 @@ const App = () => {
                 name="Name"
                 required
               />
-              {submitted && !values.name ? <span>Name Error</span> : null}
-              {submitted && values.name && !isNaN(values.name) ? (
-                <span>Name is not alphanumeric</span>
-              ) : null}
             </li>
 
             <li className="form-row">
@@ -90,10 +103,6 @@ const App = () => {
                 name="email"
                 required
               />
-              {submitted && !values.email ? <span>Email Error</span> : null}
-              {submitted && values.email && !values.email.includes("@") ? (
-                <span>Email must contain @</span>
-              ) : null}
             </li>
 
             <li className="form-row">
@@ -121,9 +130,6 @@ const App = () => {
                 required
                 placeholder="phone"
               />
-              {submitted && !values.phonenumber ? (
-                <span>Phone Number Error</span>
-              ) : null}
             </li>
 
             <li className="form-row">
@@ -138,19 +144,25 @@ const App = () => {
                 onChange={handlePasswordInputChange}
                 placeholder="password"
               />
-              {submitted && !values.password ? (
-                <span>Password Error</span>
-              ) : null}
-              {submitted &&
-              values.password &&
-              document.getElementById("pass").value.length < 6 ? (
-                <span>Password must contain atleast 6 letters</span>
-              ) : null}
+            </li>
+
+            <li className="form-row">
+              <label>
+                <input
+                  type="checkbox"
+                  id="termsAndConditions"
+                  data-testid="termsAndConditions"
+                  checked={values.termsAndConditions}
+                  onChange={handleTermsInputChange}
+                  required
+                />
+                Accept Terms and Conditions
+              </label>
             </li>
 
             <li className="form-row">
               <button type="submit" data-testid="submit">
-                Submit
+                Sign Up
               </button>
             </li>
           </ul>
